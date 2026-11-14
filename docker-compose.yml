@@ -1,0 +1,23 @@
+# Open WebUI, pointed at (1) Ollama on your Mac and (2) the you-agent server on your Mac.
+# Run the agent server on the host first:  uv run you-agent
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    ports:
+      - "3000:8080"
+    environment:
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      # Register the agent as an OpenAI-compatible provider (no auth needed, key is a placeholder)
+      OPENAI_API_BASE_URLS: http://host.docker.internal:8010/v1
+      OPENAI_API_KEYS: not-needed
+      ENABLE_OPENAI_API: "true"
+      WEBUI_AUTH: "false"          # single-user local dev; remove for multi-user
+    volumes:
+      - open-webui:/app/backend/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+volumes:
+  open-webui:
