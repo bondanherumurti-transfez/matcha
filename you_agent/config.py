@@ -74,6 +74,15 @@ SYSTEM_PROMPT = os.getenv(
 #   LANGSMITH_PROJECT=you-agent
 LANGSMITH_ENABLED = os.getenv("LANGSMITH_TRACING", "").lower() in ("1", "true", "yes")
 
+# Langfuse (see tracing.py). The SDK reads LANGFUSE_PUBLIC_KEY / LANGFUSE_SECRET_KEY /
+# LANGFUSE_BASE_URL itself; LANGFUSE_TRACING is our own on/off switch.
+LANGFUSE_ENABLED = (
+    os.getenv("LANGFUSE_TRACING", "").lower() in ("1", "true", "yes")
+    and bool(os.getenv("LANGFUSE_PUBLIC_KEY"))
+    and bool(os.getenv("LANGFUSE_SECRET_KEY"))
+)
+LANGFUSE_BASE_URL = os.getenv("LANGFUSE_BASE_URL") or os.getenv("LANGFUSE_HOST") or "https://cloud.langfuse.com"
+
 
 def you_mcp_connection() -> dict:
     """Build the MultiServerMCPClient connection dict for you.com."""

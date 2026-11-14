@@ -4,7 +4,7 @@ Runs on the user's Claude subscription (no API credits needed). Claude Code
 connects to the you.com MCP server itself and runs the tool loop; we stream its
 `--output-format stream-json` events, keep one Claude Code session per chat
 thread (`--session-id` on the first turn, `--resume` afterwards), and mirror
-the run into LangSmith.
+the run (with each tool call as a child) into LangSmith and Langfuse.
 """
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ from typing import Any, AsyncIterator
 
 from langsmith import get_current_run_tree, traceable
 
-from . import config
+from . import config, tracing
 
 log = logging.getLogger(__name__)
 
@@ -84,6 +84,7 @@ def _build_cmd(prompt: str, thread_id: str, resume: bool) -> list[str]:
 
 
 @traceable(run_type="chain", name="claude-code-chat")
+@tracing.observe(name="claude-code-chat", as_type="agent", capture_output=False)
 async def stream_chat(prompt: str, thread_id: str) -> AsyncIterator[dict[str, Any]]:
     """Yield normalized events: text / tool_call / tool_result / done / error."""
     if not available():
@@ -117,6 +118,7 @@ async def _run(prompt: str, thread_id: str, resume: bool) -> AsyncIterator[dict[
     )
     parent = get_current_run_tree()
     tool_runs: dict[str, Any] = {}      # tool_use_id -> LangSmith child run
+    lf_tools: dict[str, Any] = {}       # tool_use_id -> Langfuse tool observation
     tool_names: dict[str, str] = {}     # tool_use_id -> tool name
     final: dict[str, Any] = {}
     emitted_text = False
@@ -153,6 +155,9 @@ async def _run(prompt: str, thread_id: str, resume: bool) -> AsyncIterator[dict[
                             child = parent.create_child(name=name, run_type="tool", inputs=b.get("input", {}))
                             child.post()
                             tool_runs[b.get("id", "")] = child
+                        obs = tracing.tool_observation(name, b.get("input", {}))
+                        if obs is not None:
+                            lf_tools[b.get("id", "")] = obs
                         yield {"type": "tool_call", "name": name, "args": b.get("input", {})}
 
             elif t == "user":
@@ -166,6 +171,12 @@ async def _run(prompt: str, thread_id: str, resume: bool) -> AsyncIterator[dict[
                         if tid in tool_runs:
                             tool_runs[tid].end(outputs={"result": str(content)[:20000]}, error=None if not b.get("is_error") else str(content)[:2000])
                             tool_runs[tid].patch()
+                        if tid in lf_tools:
+                            obs = lf_tools.pop(tid)
+                            obs.update(output=str(content)[:20000],
+                                       level="ERROR" if b.get("is_error") else None,
+                                       status_message=str(content)[:2000] if b.get("is_error") else None)
+                            obs.end()
                         yield {"type": "tool_result", "name": name, "content": str(content)}
 
             elif t == "result":
@@ -176,13 +187,24 @@ async def _run(prompt: str, thread_id: str, resume: bool) -> AsyncIterator[dict[
     finally:
         if proc.returncode is None:
             proc.kill()
+        for obs in lf_tools.values():   # tool calls that never got a result
+            obs.update(level="WARNING", status_message="no tool_result before exit")
+            obs.end()
 
+    lf = tracing.client()
     if final.get("is_error") or (rc != 0 and not final):
         msg = final.get("result") or stderr.strip().splitlines()[-1:] or f"claude exited with {rc}"
+        if lf is not None:
+            lf.update_current_span(level="ERROR", status_message=str(msg)[:2000], output=None)
         yield {"type": "error", "message": str(msg)}
         return
 
     text = final.get("result", "") or ""
+    if lf is not None:
+        lf.update_current_span(output=text, metadata={
+            "session_id": final.get("session_id"), "cost_usd": final.get("total_cost_usd"),
+            "duration_ms": final.get("duration_ms"), "num_turns": final.get("num_turns"),
+            "usage": final.get("usage"), "model": config.CLAUDE_CODE_MODEL})
     yield {"type": "done", "text": text, "emitted_text": emitted_text, "meta": {
         "session_id": final.get("session_id"), "cost_usd": final.get("total_cost_usd"),
         "duration_ms": final.get("duration_ms"), "num_turns": final.get("num_turns"),

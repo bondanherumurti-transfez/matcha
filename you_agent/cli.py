@@ -7,7 +7,7 @@ import asyncio
 import sys
 import uuid
 
-from . import config
+from . import config, tracing
 from .runner import stream_events
 
 
@@ -27,6 +27,9 @@ async def main(q: str, provider: str | None = None):
             print(f"\n\n[done] {ev['meta']}")
         elif ev["type"] == "error":
             print(f"\n[error] {ev['message']}")
+    if tracing.enabled():
+        tracing.shutdown()   # short-lived process: push queued events to Langfuse now
+        print(f"[langfuse] trace sent to {config.LANGFUSE_BASE_URL}")
 
 
 if __name__ == "__main__":

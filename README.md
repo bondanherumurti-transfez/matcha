@@ -1,11 +1,11 @@
-# you-agent — LangGraph + you.com MCP + Ollama + Open WebUI, traced in LangSmith
+# you-agent — LangGraph + you.com MCP + Ollama + Open WebUI, traced in Langfuse + LangSmith, sessions captured by OpenCrawl
 
 A local research agent:
 
 - **Model:** switchable base model: any tool-calling model on **Ollama** (default `gpt-oss:20b`) **or Claude via the Claude Code CLI** (`claude -p`, runs on your Claude subscription, default `opus`)
 - **Tools:** the **you.com MCP server** (`https://api.you.com/mcp`) over streamable HTTP, loaded with `langchain-mcp-adapters`
 - **Agent loop:** LangGraph `create_agent` (ReAct) with per-thread memory
-- **Observability:** every run traced in **LangSmith** (model calls, tool calls, MCP results)
+- **Observability:** every run traced in **Langfuse** (self-hosted in Docker Compose) and/or **LangSmith** (model calls, tool calls, MCP results)
 - **UI:** exposed as an **OpenAI-compatible API**, so **Open WebUI** sees two models: `you-agent` (Ollama) and `you-agent-claude` (Claude Code)
 
 ```
@@ -13,7 +13,7 @@ Open WebUI ──OpenAI API──▶ you-agent (FastAPI :8010) ──▶ LangGra
                                                               │          └──▶ `claude -p` (Claude Code CLI, loads the you.com MCP itself)
                                                               │
                                                               └──MCP (HTTP)──▶ api.you.com/mcp
-                                                              └──traces─────▶ LangSmith
+                                                              └──traces─────▶ Langfuse (:3001, self-hosted) / LangSmith
 ```
 
 ## 1. Setup
@@ -29,6 +29,7 @@ Edit `.env`:
 
 | Variable | What |
 |---|---|
+| `LANGFUSE_TRACING` / `LANGFUSE_PUBLIC_KEY` / `LANGFUSE_SECRET_KEY` / `LANGFUSE_BASE_URL` | Langfuse tracing. For the self-hosted stack, use the `LANGFUSE_INIT_PROJECT_*` keys in `.env` and `http://localhost:3001`; for Langfuse Cloud use the project keys and `https://us.cloud.langfuse.com` (or `eu.`). See §5. |
 | `LANGSMITH_TRACING` / `LANGSMITH_API_KEY` / `LANGSMITH_PROJECT` | Get a key at https://smith.langchain.com → Settings → API Keys. Traces appear under the project name. |
 | `YDC_API_KEY` | Optional. Empty = you.com **free profile** (`you-search`, `you-discover`, 100 queries/day, no key). A key from https://you.com/platform unlocks `you-contents`, `you-research`, `you-finance`, `you-balance`. |
 | `YDC_ALLOWED_TOOLS` | Optional allowlist, e.g. `you-search,you-research`. |
@@ -76,7 +77,7 @@ Endpoints: `GET /v1/models`, `POST /v1/chat/completions` (streaming + non-stream
 Start Docker Desktop, then:
 
 ```bash
-docker compose up -d        # Open WebUI on http://localhost:3000
+docker compose up -d        # Open WebUI :3000 and Langfuse :3001
 ```
 
 `docker-compose.yml` already points Open WebUI at Ollama (`host.docker.internal:11434`) and registers the agent as an OpenAI connection (`host.docker.internal:8010/v1`). Open http://localhost:3000, pick **you-agent** in the model dropdown, and chat. Your plain Ollama models show up alongside it.
@@ -95,9 +96,56 @@ Pick **you-agent** for the local Ollama model or **you-agent-claude** for Claude
 
 While the agent works it streams `> 🔎 calling you-search…` / `> ✅ you-search returned` lines, then the answer with citations. Conversation memory is keyed per user + first message, so follow-ups in the same Open WebUI chat keep context (Open WebUI resends full history; the server only forwards the newest turn and lets the LangGraph checkpointer hold the rest).
 
-## 5. LangSmith
+## 5. Langfuse (self-hosted)
+
+The root `docker-compose.yml` runs Langfuse v4 alongside Open WebUI (web + worker + Postgres + ClickHouse + Redis + MinIO, ~2 GB RAM idle). One `docker compose up -d` starts both stacks.
+
+```bash
+docker compose up -d
+open http://localhost:3001               # login = LANGFUSE_INIT_USER_EMAIL / LANGFUSE_INIT_USER_PASSWORD from .env
+```
+
+Configure the Langfuse secrets and API key pair in the repo `.env` (the same file used by the agent). Generate secrets with `openssl rand -hex 32` (or the lengths shown in `.env.example`). On first boot Langfuse creates the org/project `you-agent`, the login user and the API key pair from the `LANGFUSE_INIT_*` values (headless init), so no clicking through signup. The `LANGFUSE_PUBLIC_KEY` and `LANGFUSE_SECRET_KEY` values must match the init project keys:
+
+```
+LANGFUSE_TRACING=true
+LANGFUSE_PUBLIC_KEY=pk-lf-...      # same as LANGFUSE_INIT_PROJECT_PUBLIC_KEY
+LANGFUSE_SECRET_KEY=sk-lf-...      # same as LANGFUSE_INIT_PROJECT_SECRET_KEY
+LANGFUSE_BASE_URL=http://localhost:3001
+```
+
+Restart the agent server; `GET /health` reports `langfuse.enabled`. What you get per chat turn:
+
+- **One trace per turn**, named `ollama-chat` / `claude-chat` / `claude-api-chat`, tagged `open-webui`, provider and model. Traces from the same Open WebUI chat share a **session** (the thread id) and carry the **user**, so the Sessions view shows whole conversations.
+- **LangGraph providers** (Ollama, Claude API): the `langfuse.langchain.CallbackHandler` records the graph, every model generation (prompt, completion, token usage) and every you.com MCP tool call with its raw result.
+- **Claude Code provider:** the `claude-code-chat` agent observation holds the final answer, cost, turns and token usage from the CLI's result event, with one child **tool** observation per you.com call.
+
+To use **Langfuse Cloud** instead, set `LANGFUSE_BASE_URL=https://us.cloud.langfuse.com` (or `eu.`) with keys from a cloud project. To stop the local services, run `docker compose stop langfuse-web langfuse-worker postgres clickhouse redis minio`; adding `-v` to `docker compose down` also wipes all Compose data, including Open WebUI data.
+
+## 6. LangSmith
 
 Set the three `LANGSMITH_*` vars and restart the server. Each chat becomes a run named `open-webui-chat` tagged `open-webui` and the model name, with child runs for every Ollama call and every you.com MCP tool call (inputs, raw results, latency). Nothing else is needed — the `langsmith` SDK instruments LangChain/LangGraph automatically via those env vars.
+
+## 7. OpenCrawl (self-hosted)
+
+[OpenCrawl](https://github.com/getopencrawl/opencrawl-core) captures Claude Code / Codex / Cursor sessions and makes them searchable for the team (CLI + MCP). The root `docker-compose.yml` runs it from the pinned `opencrawl-core/` git submodule (app + worker + SeaweedFS S3 + Postgres + Temporal, SQLite FTS5 search, no Airbyte, ~1.5 GB RAM idle). UI: http://localhost:8092.
+
+```bash
+git submodule update --init             # once, after cloning
+docker compose up -d --build            # first run builds the image from source (several minutes)
+docker compose exec -T opencrawl-app node -e "console.log(process.env.OPENCRAWL_URL+'/auth/signup?setup='+encodeURIComponent(process.env.OPENCRAWL_SETUP_TOKEN))"
+```
+
+Fill the `OPENCRAWL_*` secrets in `.env` once (see `.env.example`); the setup link above creates the first admin and is consumed once. Teammates join via invite links from **Team** (no email is sent). Then connect your coding agents from the host:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/getopencrawl/opencrawl-core/main/cli/install.sh | sh   # native CLI in ~/.local/bin
+opencrawl login  --api http://localhost:8092 --json                      # device-code sign-in
+opencrawl collect install --yes --backfill skip --api http://localhost:8092 --json   # hooks + skill for Claude Code & Codex
+opencrawl collect status --json
+```
+
+Agents reach search through the MCP server at `http://localhost:8092/mcp` (OAuth with PKCE; `claude mcp add --transport http opencrawl http://localhost:8092/mcp`). To upgrade, bump the submodule and rebuild; `OPENCRAWL_URL` is the token issuer, so changing it forces every CLI/MCP client to sign in again.
 
 ## Project layout
 
@@ -105,11 +153,13 @@ Set the three `LANGSMITH_*` vars and restart the server. Each chat becomes a run
 you_agent/
   config.py   # env, provider/model menu, builds the you.com MCP connection (free profile vs. Bearer key)
   agent.py    # ChatOllama | ChatAnthropic(API) + MultiServerMCPClient tools -> create_agent (LangGraph providers)
-  claude_code.py  # Claude provider: `claude -p` subprocess, stream-json parsing, session resume, LangSmith child runs
+  claude_code.py  # Claude provider: `claude -p` subprocess, stream-json parsing, session resume, LangSmith/Langfuse child runs
+  tracing.py  # Langfuse helpers: callback handler, trace attributes (session/user/tags), tool observations, flush
   runner.py   # one normalized event stream for all providers (used by server + cli)
   server.py   # FastAPI OpenAI-compatible API consumed by Open WebUI (SSE streaming)
   cli.py      # terminal smoke test
-docker-compose.yml  # Open WebUI wired to host Ollama + agent
+docker-compose.yml  # Open WebUI and self-hosted Langfuse services
+langfuse/           # legacy local env backup (gitignored)
 .env.example
 ```
 

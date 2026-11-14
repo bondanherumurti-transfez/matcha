@@ -10,7 +10,7 @@ from typing import Any, AsyncIterator
 
 from langchain_core.messages import AIMessageChunk, HumanMessage, ToolMessage
 
-from . import config
+from . import config, tracing
 from .agent import get_agent
 
 
@@ -29,6 +29,7 @@ async def _langgraph_events(provider: str, prompt: str, thread_id: str, user: st
         "run_name": "open-webui-chat",
         "tags": ["open-webui", provider, config.backend_model(provider)],
         "metadata": {"user": user, "provider": provider, "model": config.backend_model(provider)},
+        "callbacks": tracing.langchain_callbacks(),   # Langfuse (LangSmith is env-driven)
     }
     full = []
     async for mode, data in agent.astream({"messages": [HumanMessage(prompt)]}, config=cfg,
@@ -49,13 +50,18 @@ async def _langgraph_events(provider: str, prompt: str, thread_id: str, user: st
 
 
 async def stream_events(provider: str, prompt: str, thread_id: str, user: str = "anon") -> AsyncIterator[dict]:
-    if provider == "claude":
-        from .claude_code import stream_chat
-        async for ev in stream_chat(prompt, thread_id, langsmith_extra={
-                "tags": ["open-webui", "claude", config.CLAUDE_CODE_MODEL],
-                "metadata": {"user": user, "provider": "claude", "model": config.CLAUDE_CODE_MODEL,
-                             "thread_id": thread_id}}):
+    model = config.backend_model(provider)
+    # Langfuse: one trace per turn, grouped into a session per chat thread.
+    with tracing.trace_attributes(name=f"{provider}-chat", user=user, thread_id=thread_id,
+                                  tags=["open-webui", provider, model],
+                                  metadata={"provider": provider, "model": model}):
+        if provider == "claude":
+            from .claude_code import stream_chat
+            async for ev in stream_chat(prompt, thread_id, langsmith_extra={
+                    "tags": ["open-webui", "claude", model],
+                    "metadata": {"user": user, "provider": "claude", "model": model,
+                                 "thread_id": thread_id}}):
+                yield ev
+            return
+        async for ev in _langgraph_events(provider, prompt, thread_id, user):
             yield ev
-        return
-    async for ev in _langgraph_events(provider, prompt, thread_id, user):
-        yield ev
