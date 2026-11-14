@@ -1,1 +1,1 @@
-"""LangGraph agent with you.com MCP tools, Ollama model, LangSmith tracing."""
+"""LangGraph agent with you.com MCP tools, Ollama model, Langfuse tracing."""

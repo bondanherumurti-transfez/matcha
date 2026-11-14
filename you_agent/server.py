@@ -27,9 +27,9 @@ log = logging.getLogger("you_agent.server")
 async def lifespan(app: FastAPI):
     # Build the Ollama graph eagerly (loads MCP tools); Claude Code spawns per request.
     await get_agent("ollama")
-    log.info("agent ready: default=%s (%s) tools=%s langsmith=%s langfuse=%s (%s, auth_ok=%s)",
+    log.info("agent ready: default=%s (%s) tools=%s langfuse=%s (%s, auth_ok=%s)",
              config.DEFAULT_PROVIDER, config.backend_model(config.DEFAULT_PROVIDER),
-             tool_names(), config.LANGSMITH_ENABLED, config.LANGFUSE_ENABLED,
+             tool_names(), config.LANGFUSE_ENABLED,
              config.LANGFUSE_BASE_URL if config.LANGFUSE_ENABLED else "-", tracing.auth_check())
     yield
     tracing.shutdown()   # send any queued Langfuse events before the process exits
@@ -85,7 +85,6 @@ async def health():
         "default_provider": config.DEFAULT_PROVIDER,
         "models": {meta["id"]: config.backend_model(name) for name, meta in config.PROVIDERS.items()},
         "tools": tool_names(),
-        "langsmith": config.LANGSMITH_ENABLED,
         "langfuse": {"enabled": config.LANGFUSE_ENABLED,
                      "url": config.LANGFUSE_BASE_URL if config.LANGFUSE_ENABLED else None},
     }

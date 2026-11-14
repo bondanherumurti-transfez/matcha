@@ -1,4 +1,4 @@
-"""LangGraph agent: Ollama or Claude-API model + you.com MCP tools, traced by LangSmith.
+"""LangGraph agent: Ollama or Claude-API model + you.com MCP tools, traced by Langfuse.
 
 The default Claude provider (`claude`) does not go through here: it runs the
 Claude Code CLI, see claude_code.py.

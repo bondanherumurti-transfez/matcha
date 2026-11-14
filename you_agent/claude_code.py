@@ -4,7 +4,7 @@ Runs on the user's Claude subscription (no API credits needed). Claude Code
 connects to the you.com MCP server itself and runs the tool loop; we stream its
 `--output-format stream-json` events, keep one Claude Code session per chat
 thread (`--session-id` on the first turn, `--resume` afterwards), and mirror
-the run (with each tool call as a child) into LangSmith and Langfuse.
+the run (with each tool call as a child) into Langfuse.
 """
 from __future__ import annotations
 
@@ -16,8 +16,6 @@ import shutil
 import uuid
 from pathlib import Path
 from typing import Any, AsyncIterator
-
-from langsmith import get_current_run_tree, traceable
 
 from . import config, tracing
 
@@ -83,7 +81,6 @@ def _build_cmd(prompt: str, thread_id: str, resume: bool) -> list[str]:
     return cmd
 
 
-@traceable(run_type="chain", name="claude-code-chat")
 @tracing.observe(name="claude-code-chat", as_type="agent", capture_output=False)
 async def stream_chat(prompt: str, thread_id: str) -> AsyncIterator[dict[str, Any]]:
     """Yield normalized events: text / tool_call / tool_result / done / error."""
@@ -116,8 +113,6 @@ async def _run(prompt: str, thread_id: str, resume: bool) -> AsyncIterator[dict[
         stdin=asyncio.subprocess.DEVNULL, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE,
         limit=64 * 1024 * 1024,  # stream-json lines carry whole tool results; default 64 KiB is too small
     )
-    parent = get_current_run_tree()
-    tool_runs: dict[str, Any] = {}      # tool_use_id -> LangSmith child run
     lf_tools: dict[str, Any] = {}       # tool_use_id -> Langfuse tool observation
     tool_names: dict[str, str] = {}     # tool_use_id -> tool name
     final: dict[str, Any] = {}
@@ -151,10 +146,6 @@ async def _run(prompt: str, thread_id: str, resume: bool) -> AsyncIterator[dict[
                     if b.get("type") == "tool_use":
                         name = str(b.get("name", "")).removeprefix("mcp__youdotcom__")
                         tool_names[b.get("id", "")] = name
-                        if parent is not None:
-                            child = parent.create_child(name=name, run_type="tool", inputs=b.get("input", {}))
-                            child.post()
-                            tool_runs[b.get("id", "")] = child
                         obs = tracing.tool_observation(name, b.get("input", {}))
                         if obs is not None:
                             lf_tools[b.get("id", "")] = obs
@@ -168,9 +159,6 @@ async def _run(prompt: str, thread_id: str, resume: bool) -> AsyncIterator[dict[
                         content = b.get("content")
                         if isinstance(content, list):
                             content = "\n".join(c.get("text", "") for c in content if isinstance(c, dict))
-                        if tid in tool_runs:
-                            tool_runs[tid].end(outputs={"result": str(content)[:20000]}, error=None if not b.get("is_error") else str(content)[:2000])
-                            tool_runs[tid].patch()
                         if tid in lf_tools:
                             obs = lf_tools.pop(tid)
                             obs.update(output=str(content)[:20000],

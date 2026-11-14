@@ -10,7 +10,6 @@ dependencies = [
     "langchain-ollama>=1.1.0",
     "langfuse>=5.2.0",
     "langgraph>=1.2.22",
-    "langsmith>=0.14.17",
     "python-dotenv>=1.2.4",
     "uvicorn[standard]>=0.54.0",
 ]

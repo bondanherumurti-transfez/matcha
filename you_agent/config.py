@@ -61,18 +61,17 @@ AGENT_NAME = os.getenv("AGENT_NAME", "you-agent")
 AGENT_PORT = int(os.getenv("AGENT_PORT", "8010"))
 SYSTEM_PROMPT = os.getenv(
     "SYSTEM_PROMPT",
-    "You are a research assistant with live web access through you.com tools. "
-    "Use you-search for anything that needs current or factual information; "
-    "for news or 'latest/recent' questions pass freshness='day' or 'week'. "
-    "Use you-contents / you-research (when available) for depth. "
-    "Always cite the URLs you relied on. If you did not search, say so.",
+    "You are you-agent, a research assistant that answers questions using the you.com tools. "
+    "Always call you-search before answering any question, even if you think you already "
+    "know the answer; your own knowledge may be outdated, so ground every answer in what "
+    "the search returns. For news or 'latest/recent' questions pass freshness='day' or 'week'. "
+    "Use you-contents / you-research (when available) to read pages in depth. "
+    "Base your answer on the search results and cite the URLs you relied on. "
+    "If the results do not answer the question, say so instead of guessing. "
+    "The only time you may skip searching is for pure conversation, such as greetings "
+    "or questions about what you can do.",
 )
 
-# LangSmith is configured purely via env vars read by the langsmith SDK:
-#   LANGSMITH_TRACING=true
-#   LANGSMITH_API_KEY=lsv2_...
-#   LANGSMITH_PROJECT=you-agent
-LANGSMITH_ENABLED = os.getenv("LANGSMITH_TRACING", "").lower() in ("1", "true", "yes")
 
 # Langfuse (see tracing.py). The SDK reads LANGFUSE_PUBLIC_KEY / LANGFUSE_SECRET_KEY /
 # LANGFUSE_BASE_URL itself; LANGFUSE_TRACING is our own on/off switch.

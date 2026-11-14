@@ -1,4 +1,4 @@
-"""Langfuse tracing (runs alongside LangSmith; either, both or neither can be on).
+"""Langfuse tracing (optional: off when LANGFUSE_TRACING is not true).
 
 Enabled when LANGFUSE_TRACING=true and LANGFUSE_PUBLIC_KEY / LANGFUSE_SECRET_KEY
 are set; LANGFUSE_BASE_URL points at the self-hosted stack (langfuse/) or Cloud.

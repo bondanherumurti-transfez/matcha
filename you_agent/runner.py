@@ -29,7 +29,7 @@ async def _langgraph_events(provider: str, prompt: str, thread_id: str, user: st
         "run_name": "open-webui-chat",
         "tags": ["open-webui", provider, config.backend_model(provider)],
         "metadata": {"user": user, "provider": provider, "model": config.backend_model(provider)},
-        "callbacks": tracing.langchain_callbacks(),   # Langfuse (LangSmith is env-driven)
+        "callbacks": tracing.langchain_callbacks(),   # Langfuse
     }
     full = []
     async for mode, data in agent.astream({"messages": [HumanMessage(prompt)]}, config=cfg,
@@ -57,10 +57,7 @@ async def stream_events(provider: str, prompt: str, thread_id: str, user: str = 
                                   metadata={"provider": provider, "model": model}):
         if provider == "claude":
             from .claude_code import stream_chat
-            async for ev in stream_chat(prompt, thread_id, langsmith_extra={
-                    "tags": ["open-webui", "claude", model],
-                    "metadata": {"user": user, "provider": "claude", "model": model,
-                                 "thread_id": thread_id}}):
+            async for ev in stream_chat(prompt, thread_id):
                 yield ev
             return
         async for ev in _langgraph_events(provider, prompt, thread_id, user):
