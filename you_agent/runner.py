@@ -60,5 +60,7 @@ async def stream_events(provider: str, prompt: str, thread_id: str, user: str = 
             async for ev in stream_chat(prompt, thread_id):
                 yield ev
             return
-        async for ev in _langgraph_events(provider, prompt, thread_id, user):
+        from .orchestrator import stream_events as orchestrated_events
+        async for ev in orchestrated_events(provider, prompt, thread_id, user):
             yield ev
+        return

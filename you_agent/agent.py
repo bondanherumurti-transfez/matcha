@@ -63,6 +63,17 @@ async def load_you_tools() -> list:
     return tools
 
 
+async def get_you_tools() -> list:
+    """Return the shared you.com tool set, loading it once for all workflows."""
+    global _tools
+    if _tools:
+        return _tools
+    async with _lock:
+        if not _tools:
+            _tools = await load_you_tools()
+        return _tools
+
+
 async def get_agent(provider: str | None = None):
     """Lazily build (once per provider) and return the compiled agent graph.
 

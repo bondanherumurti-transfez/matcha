@@ -1,13 +1,13 @@
 # you-agent
 
-A local research agent you chat with in a browser. It runs on Ollama (or Claude), searches the web with the you.com MCP server, logs every step to Langfuse, and has its coding sessions captured by OpenCrawl.
+A local research agent you chat with in a browser. Its LangGraph providers run a four-role research workflow on Ollama or the Anthropic API, search the web with the you.com MCP server, log calls to Langfuse, and share role findings through OpenCrawl when it is available. The Claude Code CLI provider remains a direct Claude session.
 
 ## The stack
 
 | Piece | What it does | Where it runs |
 |---|---|---|
 | **Ollama** | Local LLM (`gpt-oss:20b` by default) | Host, `:11434` |
-| **Agent** (`you_agent/`) | LangGraph ReAct agent with you.com search tools, exposed as an OpenAI-style API | Host, `:8010` |
+| **Agent** (`you_agent/`) | Four-role LangGraph research workflow with you.com search tools, exposed as an OpenAI-style API | Host, `:8010` |
 | **Open WebUI** | Chat interface. Talks to the agent and to Ollama | Docker, `:3000` |
 | **Langfuse** | Tracing. Every chat turn, model call and tool call shows up here | Docker, `:3001` |
 | **OpenCrawl** | Captures Claude Code / Codex sessions and makes them searchable for the team | Docker, `:8092` |
@@ -82,7 +82,7 @@ opencrawl collect install --yes --backfill skip --api http://localhost:8092 --js
    - **you-agent** uses Ollama.
    - **you-agent-claude** uses Claude through the Claude Code CLI (needs `claude` installed and logged in; bills your subscription).
    - **you-agent-claude-api** appears only if `ANTHROPIC_API_KEY` is set.
-3. Ask something. You will see `🔎 calling you-search…` lines while it works, then an answer with citations.
+3. Ask something. The LangGraph workflow runs a detective, bull, bear and judge in sequence, then writes a concise answer with citations. It shows each role while it works. Role findings are published and fetched from an OpenCrawl case topic when the CLI is available; otherwise the workflow passes findings directly between roles.
 4. Open http://localhost:3001 to see the trace for that turn in Langfuse. Turns from the same chat are grouped as a session.
 
 Terminal version, no UI needed:
@@ -116,6 +116,9 @@ docker compose down -v           # remove containers AND all data (Langfuse, Ope
 you_agent/
   config.py       # env parsing, model menu, you.com MCP connection
   agent.py        # LangGraph agent for Ollama / Anthropic API
+  orchestrator.py # detective, bull, bear, judge workflow and board handoffs
+  prompts/        # editable role instructions
+  opencrawl.py    # optional board client
   claude_code.py  # Claude Code CLI provider (`claude -p`)
   tracing.py      # Langfuse helpers
   runner.py       # one event stream for all providers

@@ -3,6 +3,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# --- OpenCrawl board (optional collaboration between research roles) ---------
+OPENCRAWL_BOARD = os.getenv("OPENCRAWL_BOARD", "true").lower() in ("1", "true", "yes")
+OPENCRAWL_BIN = os.getenv("OPENCRAWL_BIN", "opencrawl")
+OPENCRAWL_URL = os.getenv("OPENCRAWL_URL", "http://localhost:8092")
+
 # --- Ollama -----------------------------------------------------------------
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gpt-oss:20b")
