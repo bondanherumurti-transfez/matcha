@@ -1,0 +1,24 @@
+/* Beauty. — colour system. Values sampled from the source landing-page artwork. */
+:root{
+/* Leaf green — the single brand colour. --green-600 is the button/link green sampled at rgb(44,157,47). */
+--green-900:#12561A;--green-800:#1A7222;--green-700:#218628;--green-600:#2C9D2F;--green-500:#3FB143;--green-400:#6BC96D;--green-300:#A3DFA4;--green-200:#C3E2C6;--green-100:#DCEEDC;--green-50:#F1F8F1;
+/* Paper — the page is white; tints are barely-there greens, never grey-blue. */
+--paper-0:#FFFFFF;--paper-1:#F8FAF7;--paper-2:#FAFAFA;--paper-3:#F2F5F1;
+/* Ink — warm-neutral greys, slightly green-leaning. Headings are near-black. */
+--ink-900:#101413;--ink-800:#1D2321;--ink-700:#3A423F;--ink-600:#6E7671;--ink-500:#8E9691;--ink-400:#B4BBB6;--ink-300:#D8DCD8;--ink-200:#E8ECE7;--ink-100:#F0F2EF;
+/* Gold — used only for star ratings. */
+--gold-600:#D08F2A;--gold-500:#E8A33C;--gold-400:#F2B75C;
+/* Alpha utilities */
+--alpha-ink-06:rgba(16,20,19,.06);--alpha-ink-10:rgba(16,20,19,.10);--alpha-white-70:rgba(255,255,255,.70);--alpha-green-12:rgba(44,157,47,.12);
+
+/* ── Semantic aliases ───────────────────────────────────────── */
+--text-heading:var(--ink-900);--text-body:var(--ink-600);--text-muted:var(--ink-500);--text-faint:var(--ink-400);--text-inverse:#FFFFFF;--text-accent:var(--green-600);--text-link:var(--green-700);--text-price:var(--green-600);
+--surface-page:var(--paper-0);--surface-card:#FFFFFF;--surface-band:var(--paper-1);--surface-photo:var(--paper-2);--surface-tint:var(--green-50);--surface-tint-strong:var(--green-100);--surface-footer:var(--paper-1);--surface-blob:var(--green-100);
+--border-hairline:var(--ink-200);--border-subtle:var(--ink-100);--border-accent:var(--green-600);--border-ring:var(--green-100);
+--action-primary-bg:var(--green-600);--action-primary-bg-hover:var(--green-700);--action-primary-bg-active:var(--green-800);--action-primary-fg:#FFFFFF;
+--action-ghost-fg:var(--green-700);--action-ghost-border:var(--green-500);--action-ghost-bg-hover:var(--green-50);
+--action-quiet-fg:var(--ink-700);--action-quiet-fg-hover:var(--green-600);
+--nav-link:var(--ink-700);--nav-link-active:var(--green-600);--badge-bg:var(--green-600);--badge-fg:#FFFFFF;
+--rating-star:var(--gold-500);--rating-star-empty:var(--ink-300);
+--focus-ring:rgba(44,157,47,.35);
+}

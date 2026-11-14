@@ -1,0 +1,22 @@
+/* Beauty. — spacing, radii, layout. 4px base; sections breathe generously. */
+:root{
+--space-0:0;--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-7:32px;--space-8:40px;--space-9:48px;--space-10:64px;--space-11:80px;--space-12:96px;--space-13:120px;--space-14:160px;
+
+/* Radii — pills for actions, generously rounded panels, soft cards. */
+--radius-xs:6px;--radius-sm:8px;--radius-md:12px;--radius-lg:20px;--radius-xl:28px;--radius-pill:999px;--radius-circle:50%;
+
+/* Borders */
+--border-width-hairline:1px;--border-width-ghost:1.5px;--border-width-ring:8px;
+
+/* Layout */
+--container-max:1200px;--container-gutter:var(--space-8);--grid-gap:var(--space-8);
+--section-padding-y:var(--space-13);--section-padding-y-tight:var(--space-11);
+--hero-min-height:620px;--nav-height:88px;
+--measure-body:58ch;--measure-lede:52ch;--measure-card:44ch;
+
+/* Component metrics (exact values from the artwork) */
+--button-height:46px;--button-height-sm:38px;--button-padding-x:28px;--button-padding-x-sm:22px;
+--card-padding:var(--space-9);--card-padding-sm:var(--space-6);
+--step-circle-size:150px;--step-badge-size:34px;
+--icon-size-sm:16px;--icon-size:20px;--icon-size-lg:24px;--social-button-size:34px;
+}

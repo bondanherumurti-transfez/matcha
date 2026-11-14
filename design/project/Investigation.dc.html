@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/elevation.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/motion.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/base.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/styles.css">
+  <script src="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/_ds_bundle.js"></script>
+  <style>
+    html,body{margin:0;min-height:100%;background:#fff}
+    a{color:var(--green-700)} a:hover{color:var(--green-800)}
+  </style>
+</helmet>
+<div data-screen-label="Investigation detail" style="font-family:'DM Sans',sans-serif;color:var(--ink-700);background:#fff;min-height:100vh;padding:0 24px 72px;box-sizing:border-box">
+  <div style="max-width:880px;margin:0 auto">
+    <header style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:28px 0;border-bottom:1px solid var(--ink-200)">
+      <div style="font-size:22px;font-weight:700;color:var(--ink-900);letter-spacing:-0.01em">{{ companyName }}</div>
+      <a href="Investigations Dashboard.dc.html" style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:500;text-decoration:none">
+        <x-import component-from-global-scope="BeautyDesignSystem_421f64.Icon" name="arrow-left" size="15" hint-size="15px,15px"></x-import>
+        <span>Back to investigations</span>
+      </a>
+    </header>
+
+    <section style="padding:40px 0 32px;border-bottom:1px solid var(--ink-200)">
+      <x-import component-from-global-scope="BeautyDesignSystem_421f64.Eyebrow" hint-size="180px,18px">Investigation DE-0021</x-import>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:10px">
+        <div>
+          <h1 style="font-family:'Playfair Display',serif;font-weight:700;font-size:clamp(30px,5vw,44px);line-height:1.1;letter-spacing:-0.01em;color:var(--ink-900);margin:0">Acme AI</h1>
+          <div style="font-size:14px;color:var(--ink-600);margin-top:8px">Enterprise AI · Seed stage</div>
+        </div>
+        <div style="font-size:12px;font-weight:700;padding:6px 14px;border-radius:999px;background:#FBEFD9;color:#7A4E0E;white-space:nowrap">Under investigation</div>
+      </div>
+      <div style="margin-top:32px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:12px">
+          <span style="font-size:14px;font-weight:500;color:var(--ink-900)">Investigation progress</span>
+          <span style="font-family:'Playfair Display',serif;font-weight:700;font-size:24px;color:var(--ink-900)">68%</span>
+        </div>
+        <div style="height:8px;border-radius:999px;background:var(--green-50);overflow:hidden">
+          <div style="width:68%;height:100%;border-radius:999px;background:var(--green-600)"></div>
+        </div>
+      </div>
+    </section>
+
+    <section style="padding:40px 0;border-bottom:1px solid var(--ink-200)">
+      <h2 style="font-family:'Playfair Display',serif;font-weight:700;font-size:24px;line-height:1.2;letter-spacing:-0.01em;color:var(--ink-900);margin:0 0 16px">Intelligence Team</h2>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ team }}" as="t" hint-placeholder-count="4">
+          <div style="display:flex;align-items:center;gap:16px;padding:18px 22px;border-radius:12px;background:#fff;box-shadow:var(--shadow-card)">
+            <div style="width:40px;height:40px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;background:var(--green-100);color:var(--green-800)">
+              <x-import component-from-global-scope="BeautyDesignSystem_421f64.Icon" name="{{ t.icon }}" size="17" hint-size="17px,17px"></x-import>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="font-family:'Playfair Display',serif;font-weight:700;font-size:15px;letter-spacing:0.16em;color:var(--ink-900)">{{ t.name }}</div>
+              <div style="font-size:14px;color:var(--ink-600);margin-top:3px">{{ t.task }}</div>
+            </div>
+            <div style="font-size:12px;font-weight:700;padding:6px 14px;border-radius:999px;flex:none;white-space:nowrap;background:{{ t.bg }};color:{{ t.fg }}">{{ t.status }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="padding:40px 0 0">
+      <h2 style="font-family:'Playfair Display',serif;font-weight:700;font-size:24px;line-height:1.2;letter-spacing:-0.01em;color:var(--ink-900);margin:0 0 20px">Live Intelligence Feed</h2>
+      <div style="display:flex;flex-direction:column;gap:28px;padding:0 14px">
+        <sc-for list="{{ feed }}" as="f" hint-placeholder-count="3">
+          <a href="Evidence Room.dc.html" style="display:flex;align-items:flex-start;gap:14px;padding:14px;margin:-14px;border-radius:12px;text-decoration:none;transition:background 160ms cubic-bezier(.22,.61,.36,1)" style-hover="background:var(--green-50)">
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;padding:4px 10px;border-radius:999px;flex:none;margin-top:1px;background:{{ f.bg }};color:{{ f.fg }}">{{ f.agent }}</div>
+            <div style="min-width:0;flex:1">
+              <div style="font-size:15px;line-height:1.5;color:var(--ink-900);text-wrap:pretty">{{ f.text }}</div>
+              <div style="font-size:13px;color:var(--ink-600);margin-top:4px">{{ f.meta }}</div>
+            </div>
+            <div style="color:var(--ink-400);display:flex;flex:none;margin-top:3px">
+              <x-import component-from-global-scope="BeautyDesignSystem_421f64.Icon" name="chevron-right" size="17" hint-size="17px,17px"></x-import>
+            </div>
+          </a>
+        </sc-for>
+      </div>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;companyName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Sherlock Capital&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const st = {
+      Completed: ['var(--ink-200)', 'var(--ink-700)'],
+      Investigating: ['#FBEFD9', '#7A4E0E'],
+      Queued: ['var(--green-50)', 'var(--ink-600)']
+    };
+    const team = [
+      { name: 'THE BULL', task: 'Building the investment case', status: 'Completed', icon: 'sparkles' },
+      { name: 'THE BEAR', task: 'Searching for disconfirming evidence', status: 'Investigating', icon: 'x' },
+      { name: 'THE DETECTIVE', task: 'Investigating hidden connections', status: 'Investigating', icon: 'search' },
+      { name: 'THE JUDGE', task: 'Waiting for analyst findings', status: 'Queued', icon: 'user' }
+    ].map(t => ({ ...t, bg: st[t.status][0], fg: st[t.status][1] }));
+    const ag = {
+      BULL: ['var(--green-100)', 'var(--green-900)'],
+      BEAR: ['var(--ink-900)', '#fff'],
+      DETECTIVE: ['#FBEFD9', '#7A4E0E']
+    };
+    const feed = [
+      { agent: 'BULL', text: 'Found evidence of two enterprise customer announcements.', meta: '2 sources attached · 10:42' },
+      { agent: 'BEAR', text: 'Could not independently establish that either announcement represents a paying customer.', meta: 'Contradiction submitted · 10:43' },
+      { agent: 'DETECTIVE', text: 'Investigating whether the announced partnership is commercial or strategic.', meta: 'Research in progress · 10:44' }
+    ].map(f => ({ ...f, bg: ag[f.agent][0], fg: ag[f.agent][1] }));
+    return { companyName: this.props.companyName ?? 'Sherlock Capital', team, feed };
+  }
+}
+</script>
+</body>
+</html>

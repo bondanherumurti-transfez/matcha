@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/elevation.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/motion.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/base.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/styles.css">
+  <script src="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/_ds_bundle.js"></script>
+  <style>
+    html,body{margin:0;min-height:100%;background:#fff}
+    a{color:var(--green-700)} a:hover{color:var(--green-800)}
+  </style>
+</helmet>
+<div data-screen-label="Investigations dashboard" style="font-family:'DM Sans',sans-serif;color:var(--ink-700);background:#fff;min-height:100vh;padding:0 24px 72px;box-sizing:border-box">
+  <div style="max-width:880px;margin:0 auto">
+    <header style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:28px 0;border-bottom:1px solid var(--ink-200)">
+      <div style="font-size:22px;font-weight:700;color:var(--ink-900);letter-spacing:-0.01em">{{ companyName }}</div>
+      <x-import component-from-global-scope="BeautyDesignSystem_421f64.Eyebrow" hint-size="170px,18px">Investment Intelligence</x-import>
+    </header>
+
+    <section style="padding:40px 0 0">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 20px">
+        <h1 style="font-family:'Playfair Display',serif;font-weight:700;font-size:clamp(26px,4vw,34px);line-height:1.15;letter-spacing:-0.01em;color:var(--ink-900);margin:0">Investigations</h1>
+        <div style="font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;background:var(--green-50);color:var(--green-700)">Live</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px">
+        <x-import component-from-global-scope="BeautyDesignSystem_421f64.Card" padding="24px" hint-size="100%,130px">
+          <div style="font-family:'Playfair Display',serif;font-weight:700;font-size:48px;line-height:1;color:#A8701E">03</div>
+          <div style="font-size:14px;color:var(--ink-600);margin-top:14px">Pending</div>
+        </x-import>
+        <x-import component-from-global-scope="BeautyDesignSystem_421f64.Card" padding="24px" hint-size="100%,130px">
+          <div style="font-family:'Playfair Display',serif;font-weight:700;font-size:48px;line-height:1;color:var(--green-600)">02</div>
+          <div style="font-size:14px;color:var(--ink-600);margin-top:14px">Review required</div>
+        </x-import>
+        <x-import component-from-global-scope="BeautyDesignSystem_421f64.Card" padding="24px" hint-size="100%,130px">
+          <div style="font-family:'Playfair Display',serif;font-weight:700;font-size:48px;line-height:1;color:var(--ink-600)">03</div>
+          <div style="font-size:14px;color:var(--ink-600);margin-top:14px">Completed</div>
+        </x-import>
+      </div>
+    </section>
+
+    <section style="padding:40px 0 0">
+      <h2 style="font-family:'Playfair Display',serif;font-weight:700;font-size:24px;line-height:1.2;letter-spacing:-0.01em;color:var(--ink-900);margin:0 0 16px">Recent Investigations</h2>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="3">
+          <a href="Investigation.dc.html" style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 22px;border-radius:12px;background:#fff;box-shadow:var(--shadow-card);text-decoration:none;transition:transform 240ms cubic-bezier(.22,.61,.36,1)" style-hover="transform:translateY(-2px)">
+            <div style="min-width:0;flex:1">
+              <div style="font-size:17px;font-weight:700;color:var(--ink-900)">{{ r.name }}</div>
+              <div style="font-size:14px;color:var(--ink-600);margin-top:4px">{{ r.sector }}</div>
+            </div>
+            <div style="font-size:12px;font-weight:700;padding:6px 14px;border-radius:999px;background:{{ r.bg }};color:{{ r.color }};flex:none;white-space:nowrap">{{ r.status }}</div>
+          </a>
+        </sc-for>
+      </div>
+      <a href="New Investigation.dc.html" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:20px;height:48px;border-radius:999px;background:var(--green-600);color:#fff;font-size:15px;font-weight:700;text-decoration:none;transition:background 160ms cubic-bezier(.22,.61,.36,1)" style-hover="background:var(--green-700);color:#fff">
+        <x-import component-from-global-scope="BeautyDesignSystem_421f64.Icon" name="plus" size="16" hint-size="16px,16px"></x-import>
+        Launch Investigation
+      </a>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;companyName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Sherlock Capital&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      companyName: this.props.companyName ?? 'Sherlock Capital',
+      rows: [
+        { name: 'Acme AI', sector: 'Enterprise AI', status: 'Pending', color: '#7A4E0E', bg: '#FBEFD9' },
+        { name: 'Nexus Robotics', sector: 'Robotics', status: 'Review required', color: '#fff', bg: 'var(--green-600)' },
+        { name: 'Vector Health', sector: 'Healthcare', status: 'Completed', color: 'var(--ink-700)', bg: 'var(--ink-200)' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

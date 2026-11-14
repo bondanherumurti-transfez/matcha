@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/elevation.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/motion.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/base.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/styles.css">
+  <script src="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/_ds_bundle.js"></script>
+  <style>
+    html,body{margin:0;min-height:100%;background:#fff}
+    a{color:var(--green-700)} a:hover{color:var(--green-800)}
+    input::placeholder{color:var(--ink-400)}
+  </style>
+</helmet>
+<div data-screen-label="New investigation" style="font-family:'DM Sans',sans-serif;color:var(--ink-700);background:#fff;min-height:100vh;padding:0 24px 72px;box-sizing:border-box">
+  <div style="max-width:720px;margin:0 auto">
+    <header style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:28px 0;border-bottom:1px solid var(--ink-200)">
+      <div style="font-size:22px;font-weight:700;color:var(--ink-900);letter-spacing:-0.01em">{{ companyName }}</div>
+      <a href="Investigations Dashboard.dc.html" style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:500;text-decoration:none">
+        <x-import component-from-global-scope="BeautyDesignSystem_421f64.Icon" name="arrow-left" size="15" hint-size="15px,15px"></x-import>
+        <span>Back to investigations</span>
+      </a>
+    </header>
+
+    <section style="padding:48px 0 0">
+      <x-import component-from-global-scope="BeautyDesignSystem_421f64.Eyebrow" hint-size="170px,18px">Step 01 Identify The Target</x-import>
+      <h1 style="font-family:'Playfair Display',serif;font-weight:700;font-size:clamp(28px,4.5vw,40px);line-height:1.15;letter-spacing:-0.01em;color:var(--ink-900);margin:10px 0 32px">New Investigation</h1>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px">
+        <label style="display:flex;flex-direction:column;gap:8px;font-size:14px;font-weight:500;color:var(--ink-900)">
+          <span>Company name</span>
+          <input type="text" placeholder="Acme AI" value="{{ name }}" onChange="{{ setName }}" style="font:inherit;font-weight:400;font-size:15px;color:var(--ink-900);height:46px;padding:0 20px;border:1.5px solid var(--ink-300);border-radius:999px;outline:none;box-sizing:border-box;width:100%;transition:border-color 160ms cubic-bezier(.22,.61,.36,1)" style-focus="border-color:var(--green-600);box-shadow:0 0 0 3px rgba(44,157,47,.35)">
+        </label>
+        <label style="display:flex;flex-direction:column;gap:8px;font-size:14px;font-weight:500;color:var(--ink-900)">
+          <span>Company website</span>
+          <input type="url" placeholder="https://acme.ai" value="{{ site }}" onChange="{{ setSite }}" style="font:inherit;font-weight:400;font-size:15px;color:var(--ink-900);height:46px;padding:0 20px;border:1.5px solid var(--ink-300);border-radius:999px;outline:none;box-sizing:border-box;width:100%;transition:border-color 160ms cubic-bezier(.22,.61,.36,1)" style-focus="border-color:var(--green-600);box-shadow:0 0 0 3px rgba(44,157,47,.35)">
+        </label>
+      </div>
+    </section>
+
+    <section style="padding:48px 0 0">
+      <h2 style="font-family:'Playfair Display',serif;font-weight:700;font-size:24px;line-height:1.2;letter-spacing:-0.01em;color:var(--ink-900);margin:0 0 6px">Documents</h2>
+      <p style="font-size:14px;line-height:1.6;color:var(--ink-600);margin:0 0 20px">The more you share, the more claims can be checked against source material.</p>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ uploads }}" as="u" hint-placeholder-count="3">
+          <label style="display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:20px;cursor:pointer;border:1.5px dashed {{ u.border }};background:{{ u.bg }};transition:background 160ms cubic-bezier(.22,.61,.36,1)" style-hover="background:var(--green-50)">
+            <input type="file" accept="{{ u.accept }}" onChange="{{ u.onPick }}" style="display:none">
+            <div style="width:40px;height:40px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;background:{{ u.dotBg }};color:{{ u.dotFg }}">
+              <x-import component-from-global-scope="BeautyDesignSystem_421f64.Icon" name="{{ u.icon }}" size="17" hint-size="17px,17px"></x-import>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+                <span style="font-size:15px;font-weight:700;color:var(--ink-900)">{{ u.title }}</span>
+                <span style="font-size:12px;color:var(--ink-600)">{{ u.tag }}</span>
+              </div>
+              <div style="font-size:13px;color:var(--ink-600);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ u.sub }}</div>
+            </div>
+            <span style="font-size:14px;font-weight:500;color:var(--green-700);flex:none">{{ u.action }}</span>
+          </label>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="padding:48px 0 0">
+      <h2 style="font-family:'Playfair Display',serif;font-weight:700;font-size:24px;line-height:1.2;letter-spacing:-0.01em;color:var(--ink-900);margin:0 0 6px">Verified Revenue</h2>
+      <p style="font-size:14px;line-height:1.6;color:var(--ink-600);margin:0 0 20px">Optional. Read-only access to payment data confirms the revenue figures in the deck.</p>
+      <x-import component-from-global-scope="BeautyDesignSystem_421f64.Card" padding="20px 24px" hint-size="100%,86px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+          <div style="min-width:0">
+            <div style="font-size:15px;font-weight:700;color:var(--ink-900)">Stripe account</div>
+            <div style="font-size:13px;color:var(--ink-600);margin-top:3px">{{ stripeSub }}</div>
+          </div>
+          <sc-if value="{{ stripeOff }}" hint-placeholder-val="{{ true }}">
+            <x-import component-from-global-scope="BeautyDesignSystem_421f64.Button" variant="ghost" size="sm" on-click="{{ toggleStripe }}" hint-size="170px,38px">Connect Stripe</x-import>
+          </sc-if>
+          <sc-if value="{{ stripeOn }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:14px">
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:6px 14px;border-radius:999px;background:var(--green-100);color:var(--green-900)">
+                <x-import component-from-global-scope="BeautyDesignSystem_421f64.Icon" name="check" size="13" hint-size="13px,13px"></x-import>
+                <span>Connected</span>
+              </div>
+              <x-import component-from-global-scope="BeautyDesignSystem_421f64.Button" variant="quiet" size="sm" on-click="{{ toggleStripe }}" hint-size="110px,38px">Disconnect</x-import>
+            </div>
+          </sc-if>
+        </div>
+      </x-import>
+    </section>
+
+    <section style="padding:48px 0 0">
+      <h2 style="font-family:'Playfair Display',serif;font-weight:700;font-size:24px;line-height:1.2;letter-spacing:-0.01em;color:var(--ink-900);margin:0 0 20px">Investigation Intensity</h2>
+      <div role="radiogroup" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+        <sc-for list="{{ levels }}" as="l" hint-placeholder-count="3">
+          <button role="radio" aria-checked="{{ l.on }}" onClick="{{ l.pick }}" style="all:unset;cursor:pointer;box-sizing:border-box;padding:18px 20px;border-radius:12px;border:1.5px solid {{ l.border }};background:{{ l.bg }};transition:background 160ms cubic-bezier(.22,.61,.36,1)" style-hover="background:var(--green-50)">
+            <div style="font-size:15px;font-weight:700;color:var(--ink-900)">{{ l.title }}</div>
+            <div style="font-size:13px;color:var(--ink-600);margin-top:4px">{{ l.time }}</div>
+          </button>
+        </sc-for>
+      </div>
+    </section>
+
+    <div style="padding:40px 0 0">
+      <a href="Investigation.dc.html" style="display:block;text-decoration:none"><x-import component-from-global-scope="BeautyDesignSystem_421f64.Button" full-width="{{ true }}" hint-size="100%,46px">Launch investigation</x-import></a>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;companyName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Sherlock Capital&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { name: '', site: '', files: {}, stripe: false, level: 'deep', off: {} };
+  renderVals() {
+    const s = this.state;
+    const uploads = [
+      { id: 'deck', title: 'Pitch deck', tag: '', hint: 'PDF, up to 25 MB', accept: '.pdf' },
+      { id: 'fin', title: 'Financial statements', tag: 'Optional', hint: 'PDF or Excel, up to 25 MB', accept: '.pdf,.xlsx,.xls,.csv' },
+      { id: 'vendors', title: 'Vendor contacts', tag: 'Optional', hint: 'Excel or CSV', accept: '.xlsx,.xls,.csv' }
+    ].map(u => {
+      const f = s.files[u.id];
+      return { ...u, sub: f || u.hint, action: f ? 'Replace' : 'Browse', icon: f ? 'check' : 'plus',
+        border: f ? 'var(--green-600)' : 'var(--ink-300)', bg: f ? 'var(--green-50)' : '#fff',
+        dotBg: f ? 'var(--green-600)' : 'var(--green-100)', dotFg: f ? '#fff' : 'var(--green-800)',
+        onPick: e => { const file = e.target.files[0]; if (file) this.setState(p => ({ files: { ...p.files, [u.id]: file.name } })); } };
+    });
+    const levels = [
+      { id: 'quick', title: 'Quick scan', time: '2 minutes' },
+      { id: 'deep', title: 'Deep investigation', time: '10 minutes' },
+      { id: 'forensic', title: 'Forensic investigation', time: '20+ minutes' }
+    ].map(l => {
+      const on = s.level === l.id;
+      return { ...l, on, border: on ? 'var(--green-600)' : 'var(--ink-300)', bg: on ? 'var(--green-50)' : '#fff', pick: () => this.setState({ level: l.id }) };
+    });
+    const objectives = ['Challenge founder claims', 'Investigate founders and team', 'Find competitors and market threats', 'Investigate technology differentiation', 'Identify negative news and controversies'].map((label, i) => {
+      const on = !s.off[i];
+      return { label, on, bg: on ? 'var(--green-600)' : '#fff', border: on ? 'var(--green-600)' : 'var(--ink-400)', toggle: () => this.setState(p => ({ off: { ...p.off, [i]: !p.off[i] } })) };
+    });
+    return {
+      companyName: this.props.companyName ?? 'Sherlock Capital',
+      name: s.name, site: s.site,
+      setName: e => this.setState({ name: e.target.value }),
+      setSite: e => this.setState({ site: e.target.value }),
+      uploads, levels, objectives,
+      stripeOn: s.stripe, stripeOff: !s.stripe,
+      stripeSub: s.stripe ? 'Revenue will be checked against payment records.' : 'Not connected',
+      toggleStripe: () => this.setState(p => ({ stripe: !p.stripe }))
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+/* Beauty. — minimal element defaults so specimen cards, kits and consumer pages
+   inherit the brand voice without any component in play. */
+html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{margin:0;background:var(--surface-page);color:var(--text-body);font-family:var(--font-sans);font-size:var(--text-body-sm);line-height:var(--leading-body)}
+h1,h2,h3,h4{font-family:var(--font-display);color:var(--text-heading);font-weight:var(--weight-display);letter-spacing:var(--tracking-display);margin:0}
+h1{font-size:var(--text-hero);line-height:var(--leading-hero);letter-spacing:var(--tracking-hero)}
+h2{font-size:var(--text-display);line-height:var(--leading-display)}
+h3{font-size:var(--text-title);line-height:var(--leading-title)}
+h4{font-size:var(--text-subtitle);line-height:var(--leading-title)}
+p{margin:0}
+a{color:var(--text-link);text-decoration:none;transition:var(--transition-color)}
+a:hover{color:var(--green-600)}
+::selection{background:var(--green-100);color:var(--ink-900)}
+*:focus-visible{outline:none;box-shadow:var(--ring-focus);border-radius:var(--radius-xs)}
+img{display:block;max-width:100%}

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/elevation.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/motion.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/tokens/base.css">
+  <link rel="stylesheet" href="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/styles.css">
+  <script src="_ds/beauty-design-system-421f64b0-5877-444e-8b03-8e7d5799d260/_ds_bundle.js"></script>
+  <style>
+    html,body{margin:0;min-height:100%;background:#fff}
+    a{color:var(--green-700)} a:hover{color:var(--green-800)}
+  </style>
+</helmet>
+<div data-screen-label="Evidence room" style="font-family:'DM Sans',sans-serif;color:var(--ink-700);background:#fff;min-height:100vh;padding:0 24px 72px;box-sizing:border-box">
+  <div style="max-width:880px;margin:0 auto">
+    <header style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:28px 0;border-bottom:1px solid var(--ink-200)">
+      <div style="font-size:22px;font-weight:700;color:var(--ink-900);letter-spacing:-0.01em">{{ companyName }}</div>
+      <a href="Investigation.dc.html" style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:500;text-decoration:none">
+        <x-import component-from-global-scope="BeautyDesignSystem_421f64.Icon" name="arrow-left" size="15" hint-size="15px,15px"></x-import>
+        <span>Back to Acme AI</span>
+      </a>
+    </header>
+
+    <section style="padding:40px 0 32px;border-bottom:1px solid var(--ink-200)">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+        <h1 style="font-family:'Playfair Display',serif;font-weight:700;font-size:clamp(30px,5vw,44px);line-height:1.1;letter-spacing:-0.01em;color:var(--ink-900);margin:0">Evidence Room</h1>
+        <div style="font-size:12px;font-weight:700;padding:6px 14px;border-radius:999px;background:#FBE3E1;color:#A3261E;white-space:nowrap">3 disputed claims</div>
+      </div>
+      <div style="margin-top:20px">
+        <x-import component-from-global-scope="BeautyDesignSystem_421f64.Eyebrow" hint-size="220px,18px">Claim 004 Customer Traction</x-import>
+      </div>
+      <div style="font-family:'Playfair Display',serif;font-weight:700;font-size:clamp(22px,3.4vw,28px);line-height:1.3;color:var(--ink-900);margin:10px 0 14px">“We have 15 enterprise customers.”</div>
+      <div style="display:flex">
+        <div style="font-size:12px;font-weight:700;padding:6px 14px;border-radius:999px;background:var(--ink-900);color:#fff">Not independently established</div>
+      </div>
+    </section>
+
+    <section style="padding:40px 0 0">
+      <h2 style="font-family:'Playfair Display',serif;font-weight:700;font-size:24px;line-height:1.2;letter-spacing:-0.01em;color:var(--ink-900);margin:0 0 16px">Evidence Collected</h2>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ sources }}" as="s" hint-placeholder-count="3">
+          <div style="padding:20px 22px;border-radius:12px;background:#fff;box-shadow:var(--shadow-card)">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+              <div style="font-size:16px;font-weight:700;color:var(--ink-900)">{{ s.title }}</div>
+              <div style="font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;flex:none;white-space:nowrap;background:{{ s.bg }};color:{{ s.fg }}">{{ s.tag }}</div>
+            </div>
+            <div style="font-size:14px;line-height:1.7;color:var(--ink-600);margin-top:6px">{{ s.finding }}</div>
+            <div style="font-size:14px;line-height:1.7;color:var(--ink-900)">{{ s.read }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;companyName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Sherlock Capital&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const tag = {
+      'Primary source': ['var(--green-600)', '#fff'],
+      'Indirect evidence': ['var(--green-100)', 'var(--green-900)'],
+      'Needs review': ['#FBEFD9', '#7A4E0E']
+    };
+    const sources = [
+      { title: 'Source A — Company press release', tag: 'Primary source', finding: 'Company announced a partnership with a Fortune 500 organization.', read: 'Supports partnership announcement, not customer revenue.' },
+      { title: 'Source B — Job listing', tag: 'Indirect evidence', finding: 'Hiring for enterprise customer success roles.', read: 'Suggests enterprise ambitions, not proof of 15 customers.' },
+      { title: 'Source C — Independent coverage', tag: 'Needs review', finding: 'Coverage references one customer deployment.', read: 'Does not corroborate the total customer count.' }
+    ].map(s => ({ ...s, bg: tag[s.tag][0], fg: tag[s.tag][1] }));
+    const ag = {
+      BULL: ['var(--green-100)', 'var(--green-900)'],
+      BEAR: ['var(--ink-900)', '#fff'],
+      JUDGE: ['var(--ink-200)', 'var(--ink-900)']
+    };
+    const views = [
+      { agent: 'BULL', text: 'Commercial traction appears promising.' },
+      { agent: 'BEAR', text: 'No independent evidence establishes 15 paying customers.' },
+      { agent: 'JUDGE', text: 'The claim remains unverified. Request customer references and contracts.' }
+    ].map(v => ({ ...v, bg: ag[v.agent][0], fg: ag[v.agent][1] }));
+    return { companyName: this.props.companyName ?? 'Sherlock Capital', sources, views };
+  }
+}
+</script>
+</body>
+</html>
