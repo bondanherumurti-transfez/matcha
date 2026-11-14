@@ -68,6 +68,14 @@ def trace_attributes(*, name: str, user: str, thread_id: str, tags: list[str],
                                 tags=tags, metadata=meta or None)
 
 
+def observation(*, name: str, as_type: str, input: Any, metadata: dict[str, Any] | None = None) -> ContextManager:
+    """Create a named child observation for one specialist agent in the current trace."""
+    c = client()
+    if c is None:
+        return nullcontext()
+    return c.start_as_current_observation(as_type=as_type, name=name, input=input, metadata=metadata)
+
+
 def observe(**kwargs):
     """`langfuse.observe` when enabled, otherwise a no-op decorator."""
     if not enabled():

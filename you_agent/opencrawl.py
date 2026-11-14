@@ -5,9 +5,9 @@ its findings as a message under the case topic; the roles after it read those
 messages back from the board by reference (message:N) before they start. Humans
 and other agents in the workspace see the same thread in the OpenCrawl UI.
 
-Backed by the `opencrawl` CLI so the saved login (or OPENCRAWL_TOKEN) is reused.
-Every call raises BoardError on failure; the orchestrator then falls back to
-passing findings in memory so a board outage never blocks an answer.
+Backed by the `opencrawl` CLI so the saved login is reused. Board errors are
+fatal to an investigation: role handoffs must be visible and retrievable from
+the shared board, never silently replaced by local-only state.
 """
 from __future__ import annotations
 
@@ -76,7 +76,10 @@ async def subscribe(session: str, *topics: str) -> dict[str, Any]:
 
 
 async def publish(session: str, topic: str, text: str, post_id: str) -> int | None:
-    """Publish a message; returns the board message id (use `message:<id>` to fetch it)."""
+    """Publish a compact role handoff (board messages are limited to 512 chars)."""
+    text = text.strip()
+    if len(text) > 512:
+        text = text[:450].rsplit(" ", 1)[0] + " … [full finding in case record]"
     data = await _cli("board", "publish", "--session", session, "--id", post_id,
                       "--topic", topic, "--text", text)
     accepted = data.get("accepted") or []

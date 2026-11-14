@@ -1,4 +1,4 @@
-# Open WebUI + self-hosted Langfuse + self-hosted OpenCrawl. The agent server and Ollama run on the host.
+# Open WebUI + self-hosted Langfuse + self-hosted OpenCrawl. The agent server runs on the host.
 # `docker compose up -d` starts all three stacks (OpenCrawl builds from the opencrawl-core submodule).
 services:
   open-webui:
@@ -7,7 +7,6 @@ services:
     ports:
       - "3000:8080"
     environment:
-      OLLAMA_BASE_URL: http://host.docker.internal:11434
       # Register the agent as an OpenAI-compatible provider (no auth needed, key is a placeholder)
       OPENAI_API_BASE_URLS: http://host.docker.internal:8010/v1
       OPENAI_API_KEYS: not-needed

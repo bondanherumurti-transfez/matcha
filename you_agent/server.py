@@ -12,12 +12,15 @@ from contextlib import asynccontextmanager
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import RedirectResponse
 from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from . import config, tracing
-from .agent import get_agent, tool_names
+from .agent import get_you_tools, tool_names
 from .runner import stream_events
+from .investigations import router as investigations_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 log = logging.getLogger("you_agent.server")
@@ -25,8 +28,8 @@ log = logging.getLogger("you_agent.server")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Build the Ollama graph eagerly (loads MCP tools); Claude Code spawns per request.
-    await get_agent("ollama")
+    # Load search tools eagerly; role reasoning runs through the Codex CLI.
+    await get_you_tools()
     log.info("agent ready: default=%s (%s) tools=%s langfuse=%s (%s, auth_ok=%s)",
              config.DEFAULT_PROVIDER, config.backend_model(config.DEFAULT_PROVIDER),
              tool_names(), config.LANGFUSE_ENABLED,
@@ -35,7 +38,14 @@ async def lifespan(app: FastAPI):
     tracing.shutdown()   # send any queued Langfuse events before the process exits
 
 
-app = FastAPI(title="you-agent", lifespan=lifespan)
+app = FastAPI(title="sherlock-capital", lifespan=lifespan)
+app.mount("/app", StaticFiles(directory="sherlock_ui", html=True), name="sherlock-ui")
+app.include_router(investigations_router)
+
+
+@app.get("/")
+async def app_home():
+    return RedirectResponse("/app/")
 
 
 class ChatMessage(BaseModel):

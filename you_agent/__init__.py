@@ -1,1 +1,1 @@
-"""LangGraph agent with you.com MCP tools, Ollama model, Langfuse tracing."""
+"""Codex-powered research team using you.com MCP, OpenCrawl, and Langfuse."""

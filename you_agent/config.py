@@ -8,11 +8,6 @@ OPENCRAWL_BOARD = os.getenv("OPENCRAWL_BOARD", "true").lower() in ("1", "true", 
 OPENCRAWL_BIN = os.getenv("OPENCRAWL_BIN", "opencrawl")
 OPENCRAWL_URL = os.getenv("OPENCRAWL_URL", "http://localhost:8092")
 
-# --- Ollama -----------------------------------------------------------------
-OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gpt-oss:20b")
-OLLAMA_NUM_CTX = int(os.getenv("OLLAMA_NUM_CTX", "16384"))
-
 # --- you.com MCP ------------------------------------------------------------
 # Free profile needs no key: you-search + you-discover, 100 queries/day.
 # With a key (https://you.com/platform) you also get you-contents, you-research,
@@ -21,33 +16,16 @@ YDC_API_KEY = os.getenv("YDC_API_KEY", "").strip()
 YDC_MCP_URL = os.getenv("YDC_MCP_URL", "https://api.you.com/mcp")
 YDC_ALLOWED_TOOLS = os.getenv("YDC_ALLOWED_TOOLS", "").strip()  # e.g. "you-search,you-research"
 
-# --- Claude via Claude Code CLI (`claude -p`) ---------------------------------
-# Uses the user's Claude subscription; Claude Code loads the you.com MCP server itself.
-CLAUDE_CODE_BIN = os.getenv("CLAUDE_CODE_BIN", "claude")
-CLAUDE_CODE_MODEL = os.getenv("CLAUDE_CODE_MODEL", "opus")      # alias (opus|sonnet|fable) or full model id
-CLAUDE_CODE_MAX_TURNS = int(os.getenv("CLAUDE_CODE_MAX_TURNS", "12"))
-CLAUDE_CODE_WORKDIR = os.getenv("CLAUDE_CODE_WORKDIR", "~/.cache/you-agent/claude-workdir")
+# --- Final synthesis via Codex CLI (`codex exec`) ------------------------------
+CODEX_BIN = os.getenv("CODEX_BIN", "codex")
+CODEX_PROFILE = os.getenv("CODEX_PROFILE", "").strip()  # optional Codex config profile
+CODEX_MODEL = os.getenv("CODEX_MODEL", "").strip()      # optional CLI model override
+CODEX_WORKDIR = os.getenv("CODEX_WORKDIR", "~/.cache/you-agent/codex-workdir")
+CODEX_TIMEOUT_SECS = int(os.getenv("CODEX_TIMEOUT_SECS", "300"))
 
-# --- Claude via Anthropic API (optional third provider, needs API credits) ------
-# Enabled only when ANTHROPIC_API_KEY is set.
-ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-opus-5-5")
-CLAUDE_EFFORT = os.getenv("CLAUDE_EFFORT_LEVEL", "medium")  # low | medium | high | xhigh | max
-CLAUDE_MAX_TOKENS = int(os.getenv("CLAUDE_MAX_TOKENS", "16000"))
-
-# --- Providers / model menu ----------------------------------------------------
-# Which base model the agent runs on. Both are exposed to Open WebUI as separate
-# models so the user can switch per chat from the model dropdown:
-#   you-agent             -> Ollama            (OLLAMA_MODEL)
-#   you-agent-claude      -> Claude Code CLI   (`claude -p`, CLAUDE_CODE_MODEL, subscription)
-#   you-agent-claude-api  -> Anthropic API     (ANTHROPIC_MODEL; only if ANTHROPIC_API_KEY is set)
-# DEFAULT_PROVIDER picks which one the CLI and unknown model names use.
-DEFAULT_PROVIDER = os.getenv("MODEL_PROVIDER", "ollama").lower()  # "ollama" | "claude" | "claude-api"
-PROVIDERS = {
-    "ollama": {"id": "you-agent", "label": "Ollama"},
-    "claude": {"id": "you-agent-claude", "label": "Claude Code"},
-}
-if os.getenv("ANTHROPIC_API_KEY"):
-    PROVIDERS["claude-api"] = {"id": "you-agent-claude-api", "label": "Claude API"}
+# --- Single model provider ----------------------------------------------------
+DEFAULT_PROVIDER = "codex"
+PROVIDERS = {"codex": {"id": "sherlock-capital", "label": "Codex + web research"}}
 
 
 def provider_for_model_id(model_id: str | None) -> str:
@@ -58,15 +36,17 @@ def provider_for_model_id(model_id: str | None) -> str:
 
 
 def backend_model(provider: str) -> str:
-    return {"claude": CLAUDE_CODE_MODEL, "claude-api": ANTHROPIC_MODEL}.get(provider, OLLAMA_MODEL)
+    if provider != "codex":
+        raise ValueError(f"unknown provider {provider!r}; this agent only supports Codex")
+    return CODEX_MODEL or "codex-default"
 
 
 # --- Agent ------------------------------------------------------------------
-AGENT_NAME = os.getenv("AGENT_NAME", "you-agent")
+AGENT_NAME = os.getenv("AGENT_NAME", "sherlock-capital")
 AGENT_PORT = int(os.getenv("AGENT_PORT", "8010"))
 SYSTEM_PROMPT = os.getenv(
     "SYSTEM_PROMPT",
-    "You are you-agent, a research assistant that answers questions using the you.com tools. "
+    "You are sherlock-capital, a research assistant that answers questions using the you.com tools. "
     "Always call you-search before answering any question, even if you think you already "
     "know the answer; your own knowledge may be outdated, so ground every answer in what "
     "the search returns. For news or 'latest/recent' questions pass freshness='day' or 'week'. "
